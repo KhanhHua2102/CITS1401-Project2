@@ -15,19 +15,21 @@ def readFile(inputFile):
             locationList = []
             for line in temp:
                 locationList.append(line[:-2].split(","))
-            print(locationList)
     except EOFError:
         return
 
-def isInRadius(x1, y1, x2, y2):
-
-    return
+def isInRadius(x1, y1, x2, y2, radius):
+    return x1 < x2 < x1 + radius and y1 < y2 < y1 + radius
 
 def LDCount():
     return
 
 def similarity(A, B):
-    return
+    numerator = (A.get("P")*B.get("P")) + (A.get("H")*B.get("H")) + (A.get("R")*B.get("R")) + (A.get("C")*B.get("C")) + (A.get("S")*B.get("S"))
+    denominator1 = (A.get("P")**2 + A.get("H")**2 + A.get("R")**2 + A.get("C")**2 + A.get("S")**2)**(1/2)
+    denominator2 = (B.get("P")**2 + B.get("H")**2 + B.get("R")**2 + B.get("C")**2 + B.get("S")**2)**(1/2)
+    result = round(numerator / (denominator1 * denominator2), 4)
+    return result
 
 def simScore():
     return
@@ -36,7 +38,7 @@ def DCommon():
     return
 
 def distance(x1, y1, x2, y2):
-    return
+    return round(((((x2 - x1)**2) + (y2 - y1)**2)) ** (1/2), 4)
 
 def LDClose():
     return
