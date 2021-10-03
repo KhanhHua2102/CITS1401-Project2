@@ -67,7 +67,8 @@ def element(locId, inputFile):
     return outputList
 
 def distance(x1, y1, x2, y2):
-    return round(((((x2 - x1)**2) + (y2 - y1)**2)) ** (1/2), 4)
+    distance = round(((((x2 - x1)**2) + (y2 - y1)**2)) ** (1/2), 4)
+    return distance
 
 def isInRadius(x1, y1, x2, y2, radius):
     return distance(x1, y1, x2, y2) < radius
@@ -118,22 +119,80 @@ def DCommonFunc(inputFile, queryLocId, radius):
         
     return DCommon
 
-def LDCloseFunc():
-    
-    return
+def LDCloseFunc(inputFile, queryLocId, radius):
+    temp = [{'P': [], 'H': [], 'R': [], 'C': [], 'S': []}, {'P': [], 'H': [], 'R': [], 'C': [], 'S': []}]
+    LDClose = [{}, {}]
+    for location in readFile(inputFile)[1]:
+        radius = float(radius)
+        latitude1 = float(element(queryLocId[0], inputFile)[0])
+        longitude1 = float(element(queryLocId[0], inputFile)[1])
+        latitude2 = float(element(queryLocId[1], inputFile)[0])
+        longitude2 = float(element(queryLocId[1], inputFile)[1])
+        x2 = float(location[1])
+        y2 = float(location[2])
+        if isInRadius(latitude1, longitude1, x2, y2, radius):
+            temp[0][location[3]].append(location[0])
+        
+        if isInRadius(latitude2, longitude2, x2, y2, radius):
+            temp[1][location[3]].append(location[0])
+
+    if temp[0].get("P")[0] != queryLocId[0]:
+        latitude1 = float(element(queryLocId[0], inputFile)[0])
+        longitude1 = float(element(queryLocId[0], inputFile)[1])
+        x2  = element(temp[0].get("P")[0], inputFile)[0]
+        y2  = element(temp[0].get("P")[0], inputFile)[1]
+        minLoc = temp[0].get("P")[0]
+        minDistance = distance(latitude1, longitude1, x2, y2)
+    for location in temp[0].get("P"):
+        if temp[0].get("P")[0] != queryLocId[0]:
+            latitude1 = float(element(queryLocId[0], inputFile)[0])
+            longitude1 = float(element(queryLocId[0], inputFile)[1])
+            x2  = element(location, inputFile)[0]
+            y2  = element(location, inputFile)[1]
+            if distance(latitude1, longitude1, x2, y2) < minDistance:
+                minLoc = location
+                minDistance = distance(latitude1, longitude1, x2, y2)
+        else:
+            continue
+    try:
+        LDClose[0]["P"] = minLoc, minDistance
+    except UnboundLocalError:
+        
+
+    if temp[0].get("H")[0] != queryLocId[0]:
+        latitude1 = float(element(queryLocId[0], inputFile)[0])
+        longitude1 = float(element(queryLocId[0], inputFile)[1])
+        x2  = element(temp[0].get("H")[0], inputFile)[0]
+        y2  = element(temp[0].get("H")[0], inputFile)[1]
+        minLoc = temp[0].get("H")[0]
+        minDistance = distance(latitude1, longitude1, x2, y2)
+    for location in temp[0].get("H"):
+        if temp[0].get("H")[0] != queryLocId[0]:
+            latitude1 = float(element(queryLocId[0], inputFile)[0])
+            longitude1 = float(element(queryLocId[0], inputFile)[1])
+            x2  = element(location, inputFile)[0]
+            y2  = element(location, inputFile)[1]
+            if distance(latitude1, longitude1, x2, y2) < minDistance:
+                minLoc = location
+                minDistance = distance(latitude1, longitude1, x2, y2)
+        else:
+            continue
+    LDClose[0]["H"] = minLoc, minDistance
+
+    return LDClose
 
 
-def main(inputFile, querylocId, radius):
-    return LDCountFunc(inputFile, querylocId, radius), simScoreFunc(LDCountFunc(inputFile, querylocId, radius)), DCommonFunc(inputFile, querylocId, radius)
+def main(inputFile, queryLocId, radius):
+    return LDCountFunc(inputFile, queryLocId, radius), simScoreFunc(LDCountFunc(inputFile, queryLocId, radius)), DCommonFunc(inputFile, queryLocId, radius), LDCloseFunc(inputFile, queryLocId, radius)
 
 main("Locations.csv", ["L26", "L52"], 3.5)
 
 
 # IMPORTANT: Round results to 4 decimal, header name variation, matching locId
 # NEED TO REMOVE 
-LDCount, simScore, DCommon = main("Locations.csv", ["L26", "L52"], 3.5)
+LDCount, simScore, DCommon, LDClose = main("Locations.csv", ["L26", "L52"], 3.5)
 print(LDCount)
 print(simScore)
 print(DCommon)
-# print(LDClose)
+print(LDClose)
 # NEED TO REMOVE 
