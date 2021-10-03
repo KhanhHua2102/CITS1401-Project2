@@ -79,14 +79,14 @@ def LDCountFunc(inputFile, queryLocId, radius):
         x2 = float(location[1])
         y2 = float(location[2])
         
-        x1 = float(element(queryLocId[0], inputFile)[0])
-        y1 = float(element(queryLocId[0], inputFile)[1])
-        if isInRadius(x1, y1, x2, y2, radius):
+        latitude1 = float(element(queryLocId[0], inputFile)[0])
+        longitude1 = float(element(queryLocId[0], inputFile)[1])
+        if isInRadius(latitude1, longitude1, x2, y2, radius):
             LDCount[0][location[3]] = LDCount[0].get(location[3]) + 1
 
-        x1 = float(element(queryLocId[1], inputFile)[0])
-        y1 = float(element(queryLocId[1], inputFile)[1])
-        if isInRadius(x1, y1, x2, y2, radius):
+        latitude1 = float(element(queryLocId[1], inputFile)[0])
+        longitude2 = float(element(queryLocId[1], inputFile)[1])
+        if isInRadius(latitude1, longitude2, x2, y2, radius):
             LDCount[1][location[3]] = LDCount[1].get(location[3]) + 1
         
     return LDCount
@@ -98,27 +98,42 @@ def similarity(A, B):
     result = round(numerator / (denominator1 * denominator2), 4)
     return result
 
-def simScoreFunc():
-    return
+def simScoreFunc(LDCount):
+    A = LDCount[0]
+    B = LDCount[1]
+    return similarity(A, B)
 
-def DCommonFunc():
-    return
+def DCommonFunc(inputFile, queryLocId, radius):
+    DCommon = {'P': [], 'H': [], 'R': [], 'C': [], 'S': []}
+    for location in readFile(inputFile)[1]:
+        radius = float(radius)
+        latitude1 = float(element(queryLocId[0], inputFile)[0])
+        longitude1 = float(element(queryLocId[0], inputFile)[1])
+        latitude2 = float(element(queryLocId[1], inputFile)[0])
+        longitude2 = float(element(queryLocId[1], inputFile)[1])
+        x2 = float(location[1])
+        y2 = float(location[2])
+        if isInRadius(latitude1, longitude1, x2, y2, radius) and isInRadius(latitude2, longitude2, x2, y2, radius):
+            DCommon[location[3]].append(location[0])
+        
+    return DCommon
 
 def LDCloseFunc():
+    
     return
 
 
 def main(inputFile, querylocId, radius):
-    return LDCountFunc(inputFile, querylocId, radius)
+    return LDCountFunc(inputFile, querylocId, radius), simScoreFunc(LDCountFunc(inputFile, querylocId, radius)), DCommonFunc(inputFile, querylocId, radius)
 
 main("Locations.csv", ["L26", "L52"], 3.5)
 
 
 # IMPORTANT: Round results to 4 decimal, header name variation, matching locId
 # NEED TO REMOVE 
-LDCount = main("Locations.csv", ["L26", "L52"], 3.5)
+LDCount, simScore, DCommon = main("Locations.csv", ["L26", "L52"], 3.5)
 print(LDCount)
-# print(simScore)
-# print(DCommon)
+print(simScore)
+print(DCommon)
 # print(LDClose)
 # NEED TO REMOVE 
