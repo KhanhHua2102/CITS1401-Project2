@@ -6,6 +6,9 @@ Student ID: 22928469
 """
 
 def handleInvalidInput(inputFile, queryLocId, radius):
+    if type(queryLocId) != list:
+        print("Invalid queryLocId input!")
+        return True
     try:
         file = open(inputFile, "r")
         radius = float(radius)
@@ -198,7 +201,7 @@ def main(inputFile, queryLocId, radius):
 # IMPORTANT: invalid input, file open error handle, invalid value, random row id, missing header, case insensitive, locID unique, header name variation, matching locId, strip, random header
 # NEED TO REMOVE 
 # LDCount, simScore, DCommon, LDClose = main("Locations.csv", ["L26", "L52"], 3.5)
-LDCount, simScore, DCommon, LDClose = main ("Locat22ions.csv" , ["L89", "L15"], "4.3")
+LDCount, simScore, DCommon, LDClose = main ("Locations.csv" , 4, "4.3")
 print(LDCount)
 print(simScore)
 print(DCommon)
