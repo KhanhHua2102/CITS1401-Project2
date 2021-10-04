@@ -44,7 +44,7 @@ def header(header):
         for index in range(6):
             if header[index].lower() == headerName:
                 headerPos.append(index)
-    return headerPos[0], headerPos[1], headerPos[2], headerPos[3], headerPos[4], headerPos[5]
+    return headerPos
 
 # compare the locId input with locId in locationList to add x, y, category element of that locId to a list
 def element(locId, inputFile):
