@@ -1,8 +1,10 @@
 """
 This is a computer program that can read the data from a CSV (comma-separated values)
 file provided to it and return different interesting analytical results.
+-----------------------
 Author: Khanh Hua Quang
 Student ID: 22928469
+-----------------------
 """
 
 def handleInvalidInput(inputFile, queryLocId, radius):
@@ -26,23 +28,16 @@ def handleInvalidInput(inputFile, queryLocId, radius):
         return True
 
 def readFile(inputFile):
-    try:
-        with open (inputFile, "r") as file:
-            header = file.readline()[:-1].split(",")
-            temp = file.readlines()
-            locationList = []
-            for line in temp:
-                locationList.append(line[:-1].split(","))
-    except EOFError:
-        print("Invalid inputFile!")
-        return
-    except FileNotFoundError:
-        print("Invalid inputFile!")
-        return
+    with open (inputFile, "r") as file:
+        header = file.readline()[:-1].split(",")
+        temp = file.readlines()
+        locationList = []
+        for line in temp:
+            locationList.append(line[:-1].split(","))
     return header, locationList
 
+# define column position in case of random header
 def header(header):
-    # define column position in case of random header
     headerPos = []
     for index in range(6):
         if header[index].lower() == "locid":
@@ -201,7 +196,7 @@ def main(inputFile, queryLocId, radius):
 # IMPORTANT: invalid input, file open error handle, invalid value, random row id, missing header, case insensitive, locID unique, header name variation, matching locId, strip, random header
 # NEED TO REMOVE 
 # LDCount, simScore, DCommon, LDClose = main("Locations.csv", ["L26", "L52"], 3.5)
-LDCount, simScore, DCommon, LDClose = main ("Locations.csv" , 4, "4.3")
+LDCount, simScore, DCommon, LDClose = main ("Locations.csv" , ["L26", "L52"], 4.3)
 print(LDCount)
 print(simScore)
 print(DCommon)
