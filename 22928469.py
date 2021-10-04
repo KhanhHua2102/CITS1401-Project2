@@ -5,6 +5,16 @@ Author: Khanh Hua Quang
 Student ID: 22928469
 """
 
+def handleInvalidInput(queryLocId, radius):
+    try:
+        radius = float(radius)
+    except ValueError:
+        print("Invalid radius input!")
+        return True
+    except SyntaxError:
+        print("Invalid radius input!")
+        return True
+
 def readFile(inputFile):
     try:
         with open (inputFile, "r") as file:
@@ -14,6 +24,7 @@ def readFile(inputFile):
             for line in temp:
                 locationList.append(line[:-1].split(","))
     except EOFError:
+        print("Invalid input!")
         return
     return header, locationList
 
@@ -80,13 +91,13 @@ def LDCountFunc(inputFile, queryLocId, radius):
         x2 = float(location[1])
         y2 = float(location[2])
         
-        latitude1 = float(element(queryLocId[0], inputFile)[0])
-        longitude1 = float(element(queryLocId[0], inputFile)[1])
+        latitude1 = float(element(queryLocId[0].strip(), inputFile)[0])
+        longitude1 = float(element(queryLocId[0].strip(), inputFile)[1])
         if isInRadius(latitude1, longitude1, x2, y2, radius):
             LDCount[0][location[3]] = LDCount[0].get(location[3]) + 1
 
-        latitude1 = float(element(queryLocId[1], inputFile)[0])
-        longitude2 = float(element(queryLocId[1], inputFile)[1])
+        latitude1 = float(element(queryLocId[1].strip(), inputFile)[0])
+        longitude2 = float(element(queryLocId[1].strip(), inputFile)[1])
         if isInRadius(latitude1, longitude2, x2, y2, radius):
             LDCount[1][location[3]] = LDCount[1].get(location[3]) + 1
         
@@ -108,10 +119,10 @@ def DCommonFunc(inputFile, queryLocId, radius):
     DCommon = {'P': [], 'H': [], 'R': [], 'C': [], 'S': []}
     for location in readFile(inputFile)[1]:
         radius = float(radius)
-        latitude1 = float(element(queryLocId[0], inputFile)[0])
-        longitude1 = float(element(queryLocId[0], inputFile)[1])
-        latitude2 = float(element(queryLocId[1], inputFile)[0])
-        longitude2 = float(element(queryLocId[1], inputFile)[1])
+        latitude1 = float(element(queryLocId[0].strip(), inputFile)[0])
+        longitude1 = float(element(queryLocId[0].strip(), inputFile)[1])
+        latitude2 = float(element(queryLocId[1].strip(), inputFile)[0])
+        longitude2 = float(element(queryLocId[1].strip(), inputFile)[1])
         x2 = float(location[1])
         y2 = float(location[2])
         if isInRadius(latitude1, longitude1, x2, y2, radius) and isInRadius(latitude2, longitude2, x2, y2, radius):
@@ -122,14 +133,14 @@ def DCommonFunc(inputFile, queryLocId, radius):
 def LDCloseFunc(inputFile, queryLocId, radius):
     temp = [{'P': [], 'H': [], 'R': [], 'C': [], 'S': []}, {'P': [], 'H': [], 'R': [], 'C': [], 'S': []}]
     LDClose = [{}, {}]
-    latitude1 = float(element(queryLocId[0], inputFile)[0])
-    longitude1 = float(element(queryLocId[0], inputFile)[1])
-    latitude2 = float(element(queryLocId[1], inputFile)[0])
-    longitude2 = float(element(queryLocId[1], inputFile)[1])
+    latitude1 = float(element(queryLocId[0].strip(), inputFile)[0])
+    longitude1 = float(element(queryLocId[0].strip(), inputFile)[1])
+    latitude2 = float(element(queryLocId[1].strip(), inputFile)[0])
+    longitude2 = float(element(queryLocId[1].strip(), inputFile)[1])
     radius = float(radius)
 
     for location in readFile(inputFile)[1]:
-        if location[0] != queryLocId[0] and location[0] != queryLocId[1]:
+        if location[0] != queryLocId[0].strip() and location[0] != queryLocId[1].strip():
             x2 = float(location[1])
             y2 = float(location[2])
             if isInRadius(latitude1, longitude1, x2, y2, radius):
@@ -143,8 +154,8 @@ def LDCloseFunc(inputFile, queryLocId, radius):
         for key in temp[i].keys():
             if len(temp[i][key]) > 0:
                 minLoc = temp[i][key][0]
-                latitude1 = float(element(queryLocId[i], inputFile)[0])
-                longitude1 = float(element(queryLocId[i], inputFile)[1])
+                latitude1 = float(element(queryLocId[i].strip(), inputFile)[0])
+                longitude1 = float(element(queryLocId[i].strip(), inputFile)[1])
                 x2  = element(minLoc, inputFile)[0]
                 y2  = element(minLoc, inputFile)[1]
                 minDistance = distance(latitude1, longitude1, x2, y2)
@@ -152,8 +163,8 @@ def LDCloseFunc(inputFile, queryLocId, radius):
                 locIdList = temp[i][key]
                 for locId in locIdList:
                     if locId != queryLocId[i]:
-                        latitude1 = float(element(queryLocId[i], inputFile)[0])
-                        longitude1 = float(element(queryLocId[i], inputFile)[1])
+                        latitude1 = float(element(queryLocId[i].strip(), inputFile)[0])
+                        longitude1 = float(element(queryLocId[i].strip(), inputFile)[1])
                         x2  = element(locId, inputFile)[0]
                         y2  = element(locId, inputFile)[1]
                         if distance(latitude1, longitude1, x2, y2) < minDistance:
@@ -168,15 +179,16 @@ def LDCloseFunc(inputFile, queryLocId, radius):
 
 
 def main(inputFile, queryLocId, radius):
-    return LDCountFunc(inputFile, queryLocId, radius), simScoreFunc(LDCountFunc(inputFile, queryLocId, radius)), DCommonFunc(inputFile, queryLocId, radius), LDCloseFunc(inputFile, queryLocId, radius)
-
-main("Locations.csv", ["L26", "L52"], 3.5)
+    if handleInvalidInput(queryLocId, radius):
+        return None, None, None, None
+    else:
+        return LDCountFunc(inputFile, queryLocId, radius), simScoreFunc(LDCountFunc(inputFile, queryLocId, radius)), DCommonFunc(inputFile, queryLocId, radius), LDCloseFunc(inputFile, queryLocId, radius)
 
 
 # IMPORTANT: invalid input, file open error handle, invalid value, random row id, missing header, case insensitive, locID unique, header name variation, matching locId, strip, random header
 # NEED TO REMOVE 
 # LDCount, simScore, DCommon, LDClose = main("Locations.csv", ["L26", "L52"], 3.5)
-LDCount, simScore, DCommon, LDClose = main ("Locations.csv" , ["L89", "L15"], 4.3)
+LDCount, simScore, DCommon, LDClose = main ("Locations.csv" , ["L89", "L15"], "4h.3d")
 print(LDCount)
 print(simScore)
 print(DCommon)
