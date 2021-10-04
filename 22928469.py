@@ -149,15 +149,15 @@ def LDCloseFunc(inputFile, queryLocId, radius):
                 y2  = element(minLoc, inputFile)[1]
                 minDistance = distance(latitude1, longitude1, x2, y2)
                 
-                locDict = temp[i][key]
-                for location in locDict:
-                    if location != queryLocId[i]:
+                locIdList = temp[i][key]
+                for locId in locIdList:
+                    if locId != queryLocId[i]:
                         latitude1 = float(element(queryLocId[i], inputFile)[0])
                         longitude1 = float(element(queryLocId[i], inputFile)[1])
-                        x2  = element(location, inputFile)[0]
-                        y2  = element(location, inputFile)[1]
+                        x2  = element(locId, inputFile)[0]
+                        y2  = element(locId, inputFile)[1]
                         if distance(latitude1, longitude1, x2, y2) < minDistance:
-                            minLoc = location
+                            minLoc = locId
                             minDistance = distance(latitude1, longitude1, x2, y2)
                     else:
                         continue
