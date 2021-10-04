@@ -39,24 +39,11 @@ def readFile(inputFile):
 # define column position in case of random header
 def header(header):
     headerPos = []
-    for index in range(6):
-        if header[index].lower() == "locid":
-            headerPos.append(index)
-    for index in range(6):
-        if header[index].lower() == "latitude":
-            headerPos.append(index)
-    for index in range(6):
-        if header[index].lower() == "longitude":
-            headerPos.append(index)
-    for index in range(6):
-        if header[index].lower() == "category":
-            headerPos.append(index)
-    for index in range(6):
-        if header[index].lower() == "reviews":
-            headerPos.append(index)
-    for index in range(6):
-        if header[index].lower() == "rankreview":
-            headerPos.append(index)
+    headerNameList = ["locid", "latitude", "longitude", "category", "reviews", "rankreview"]
+    for headerName in headerNameList:
+        for index in range(6):
+            if header[index].lower() == headerName:
+                headerPos.append(index)
     return headerPos[0], headerPos[1], headerPos[2], headerPos[3], headerPos[4], headerPos[5]
 
 # compare the locId input with locId in locationList to add x, y, category element of that locId to a list
@@ -196,7 +183,7 @@ def main(inputFile, queryLocId, radius):
 # IMPORTANT: invalid input, file open error handle, invalid value, random row id, missing header, case insensitive, locID unique, header name variation, matching locId, strip, random header
 # NEED TO REMOVE 
 # LDCount, simScore, DCommon, LDClose = main("Locations.csv", ["L26", "L52"], 3.5)
-LDCount, simScore, DCommon, LDClose = main ("Locations.csv" , ["L26", "L52"], 4.3)
+LDCount, simScore, DCommon, LDClose = main ("Locations.csv" , ["L26", "L52"], 3.5)
 print(LDCount)
 print(simScore)
 print(DCommon)
