@@ -173,9 +173,10 @@ def main(inputFile, queryLocId, radius):
 main("Locations.csv", ["L26", "L52"], 3.5)
 
 
-# IMPORTANT: Round results to 4 decimal, header name variation, matching locId
+# IMPORTANT: invalid input, file open error handle, invalid value, random row id, missing header, case insensitive, locID unique, header name variation, matching locId, strip, random header
 # NEED TO REMOVE 
-LDCount, simScore, DCommon, LDClose = main("Locations.csv", ["L26", "L52"], 3.5)
+# LDCount, simScore, DCommon, LDClose = main("Locations.csv", ["L26", "L52"], 3.5)
+LDCount, simScore, DCommon, LDClose = main ("Locations.csv" , ["L89", "L15"], 4.3)
 print(LDCount)
 print(simScore)
 print(DCommon)
