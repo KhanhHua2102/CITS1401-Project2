@@ -37,7 +37,8 @@ def readFile(inputFile):
     return header, locationList
 
 # define column position in case of random header
-def header(header):
+def header(inputFile):
+    header = readFile(inputFile)[0]
     headerPos = []
     headerNameList = ["locid", "latitude", "longitude", "category", "reviews", "rankreview"]
     for headerName in headerNameList:
@@ -46,16 +47,11 @@ def header(header):
                 headerPos.append(index)
     return headerPos
 
-# compare the locId input with locId in locationList to add x, y, category element of that locId to a list
+# compare the locId input with locId in locationList to add x, y, category, reviews, rankreview element of that locId to a list
 def element(locId, inputFile):
-    headerPos = header(readFile(inputFile)[0])
+    headerPos = header(inputFile)
     locationList = readFile(inputFile)[1]
-    locIdPos = headerPos[0]
-    xPos = headerPos[1]
-    yPos = headerPos[2] 
-    categoryPos = headerPos[3] 
-    reviewsPos = headerPos[4] 
-    rankPos = headerPos[5]
+    locIdPos, xPos, yPos, categoryPos, reviewsPos, rankPos = list(headerPos)
     outputList = []
     for location in locationList:
         if locId.lower() == location[locIdPos].lower():
