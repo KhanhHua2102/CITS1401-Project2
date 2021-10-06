@@ -103,10 +103,12 @@ def simScoreFunc(LDCount):
 
 def DCommonFunc(inputFile, queryLocId, radius):
     DCommon = {'P': [], 'H': [], 'R': [], 'C': [], 'S': []}
-    latitude1 = float(element(queryLocId[0].strip(), inputFile)[0])
-    longitude1 = float(element(queryLocId[0].strip(), inputFile)[1])
-    latitude2 = float(element(queryLocId[1].strip(), inputFile)[0])
-    longitude2 = float(element(queryLocId[1].strip(), inputFile)[1])
+    queryLocId1 = element(queryLocId[0].strip(), inputFile)
+    queryLocId2 = element(queryLocId[0].strip(), inputFile)
+    latitude1 = float(queryLocId1[0])
+    longitude1 = float(queryLocId1[1])
+    latitude2 = float(queryLocId2[0])
+    longitude2 = float(queryLocId2[1])
     radius = float(radius)
 
     locList = readFile(inputFile)[1]
@@ -121,10 +123,12 @@ def DCommonFunc(inputFile, queryLocId, radius):
 def LDCloseFunc(inputFile, queryLocId, radius):
     temp = [{'P': [], 'H': [], 'R': [], 'C': [], 'S': []}, {'P': [], 'H': [], 'R': [], 'C': [], 'S': []}]
     LDClose = [{}, {}]
-    latitude1 = float(element(queryLocId[0].strip(), inputFile)[0])
-    longitude1 = float(element(queryLocId[0].strip(), inputFile)[1])
-    latitude2 = float(element(queryLocId[1].strip(), inputFile)[0])
-    longitude2 = float(element(queryLocId[1].strip(), inputFile)[1])
+    queryLocId1 = element(queryLocId[0].strip(), inputFile)
+    queryLocId2 = element(queryLocId[0].strip(), inputFile)
+    latitude1 = float(queryLocId1[0])
+    longitude1 = float(queryLocId1[1])
+    latitude2 = float(queryLocId2[0])
+    longitude2 = float(queryLocId2[1])
     radius = float(radius)
 
     locList = readFile(inputFile)[1]
@@ -143,8 +147,9 @@ def LDCloseFunc(inputFile, queryLocId, radius):
         for key in temp[i].keys():
             if len(temp[i][key]) > 0:
                 minLoc = temp[i][key][0]
-                latitude1 = float(element(queryLocId[i].strip(), inputFile)[0])
-                longitude1 = float(element(queryLocId[i].strip(), inputFile)[1])
+                queryLocId12 = element(queryLocId[i].strip(), inputFile)
+                latitude1 = float(queryLocId12[0])
+                longitude1 = float(queryLocId12[1])
                 x2  = element(minLoc, inputFile)[0]
                 y2  = element(minLoc, inputFile)[1]
                 minDistance = distance(latitude1, longitude1, x2, y2)
@@ -152,8 +157,9 @@ def LDCloseFunc(inputFile, queryLocId, radius):
                 locIdList = temp[i][key]
                 for locId in locIdList:
                     if locId != queryLocId[i]:
-                        latitude1 = float(element(queryLocId[i].strip(), inputFile)[0])
-                        longitude1 = float(element(queryLocId[i].strip(), inputFile)[1])
+                        queryLocId12 = element(queryLocId[i].strip(), inputFile)
+                        latitude1 = float(queryLocId12[0])
+                        longitude1 = float(queryLocId12[1])
                         x2  = element(locId, inputFile)[0]
                         y2  = element(locId, inputFile)[1]
                         if distance(latitude1, longitude1, x2, y2) < minDistance:
@@ -161,9 +167,8 @@ def LDCloseFunc(inputFile, queryLocId, radius):
                             minDistance = distance(latitude1, longitude1, x2, y2)
                     else:
                         continue
-                if minLoc != 0:
-                    LDClose[i][key] = minLoc, minDistance
-    
+
+                LDClose[i][key] = minLoc, minDistance
     return LDClose
 
 
