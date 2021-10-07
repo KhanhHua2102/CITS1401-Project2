@@ -7,10 +7,6 @@ Student ID: 22928469
 -----------------------
 """
 
-
-from os import read
-
-
 def readFile(inputFile):
     with open (inputFile, "r") as file:
         header = file.readline()[:-1].split(",")
@@ -82,11 +78,9 @@ def handleInvalidInput(inputFile, queryLocId, radius):
     for locId in queryLocId:
         count = 0
         for line in readFile(inputFile)[1]:
-            a = locId
-            b = line[locIdPos]
             if getLocId(locId) == getLocId(line[locIdPos]):
                 count += 1
-        if count == 0 or count == 2:
+        if count == 0 or count > 1:
             print("Invalid queryLocId")
             return True
 
@@ -113,6 +107,20 @@ def distance(x1, y1, x2, y2):
 def isInRadius(x1, y1, x2, y2, radius):
     return distance(x1, y1, x2, y2) < radius
 
+def isDuplicated(locId, inputFile):
+    headerPos = header(inputFile)
+    locIdPos = headerPos[0]
+    locList = readFile(inputFile)[1]
+    count = 0
+    for line in locList:
+        if locId == line[locIdPos]:
+            count += 1
+    if count > 1:
+        return True
+    else:
+        return False
+
+
 def LDCountFunc(inputFile, queryLocId, radius):
     headerPos = header(inputFile)
     locIdPos = headerPos[0]
@@ -124,9 +132,11 @@ def LDCountFunc(inputFile, queryLocId, radius):
     radius = float(radius)
 
     locList = readFile(inputFile)[1]
-    for location in locList:
-        x2 = float(location[xPos])
-        y2 = float(location[yPos])
+    for line in locList:
+        if isDuplicated(line[locIdPos], inputFile):
+            continue
+        x2 = float(line[xPos])
+        y2 = float(line[yPos])
 
         for i in range(len(queryLocId)):
             if len(element(queryLocId[i], inputFile)) == 0:
@@ -134,7 +144,7 @@ def LDCountFunc(inputFile, queryLocId, radius):
             latitude1 = float(element(queryLocId[i], inputFile)[0])
             longitude1 = float(element(queryLocId[i], inputFile)[1])
             if isInRadius(latitude1, longitude1, x2, y2, radius):
-                LDCount[i][location[categoryPos]] = LDCount[i].get(location[categoryPos]) + 1
+                LDCount[i][line[categoryPos]] = LDCount[i].get(line[categoryPos]) + 1
         
     return LDCount
 
@@ -166,12 +176,14 @@ def DCommonFunc(inputFile, queryLocId, radius):
     radius = float(radius)
 
     locList = readFile(inputFile)[1]
-    for location in locList:
-        x2 = float(location[xPos])
-        y2 = float(location[yPos])
+    for line in locList:
+        if isDuplicated(line[locIdPos], inputFile):
+            continue
+        x2 = float(line[xPos])
+        y2 = float(line[yPos])
         if isInRadius(latitude1, longitude1, x2, y2, radius) and isInRadius(latitude2, longitude2, x2, y2, radius):
-            locId = location[locIdPos]
-            DCommon[location[categoryPos]].append(locId)
+            locId = line[locIdPos]
+            DCommon[line[categoryPos]].append(locId)
         
     return DCommon
 
@@ -191,6 +203,8 @@ def LDCloseFunc(inputFile, queryLocId, radius):
     locList = readFile(inputFile)[1]
 
     for line in locList:
+        if isDuplicated(line[locIdPos], inputFile):
+            continue
         locId = line[locIdPos]
         if getLocId(locId) != getLocId(queryLocId[0]) and getLocId(locId) != getLocId(queryLocId[1]):
 
@@ -204,7 +218,7 @@ def LDCloseFunc(inputFile, queryLocId, radius):
         else:
             continue
 
-    for i in range(2):
+    for i in range(len(queryLocId)):
         for key in temp[i].keys():
             if len(temp[i][key]) > 0:
 
@@ -244,7 +258,7 @@ def main(inputFile, queryLocId, radius):
 # NEED TO REMOVE 
 
 # LDCount, simScore, DCommon, LDClose = main("Locations.csv", ["L26", "L52"], 3.5)
-LDCount, simScore, DCommon, LDClose = main ("Locations.csv" , ["  ll99  ", "  gg-333  "], 3.5)
+LDCount, simScore, DCommon, LDClose = main ("Locations.csv" , ["  ll26  ", "  gg-52  "], 3.5)
 
 
 print(LDCount)
