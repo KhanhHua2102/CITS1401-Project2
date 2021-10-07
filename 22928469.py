@@ -47,7 +47,7 @@ def header(inputFile):
     headerPos = []
     headerNameList = ["LOCID", "LATITUDE", "LONGITUDE", "CATEGORY", "REVIEWS", "RANKREVIEW"]
     for headerName in headerNameList:
-        for index in range(6):
+        for index in range(len(header)):
             if header[index].upper() == headerName:
                 headerPos.append(index)
     return headerPos
@@ -64,7 +64,10 @@ def getLocId(locId):
 # compare the locId input with locId in locationList to add x, y, category, reviews, rankreview element of that locId to a list
 def element(locIdInput, inputFile):
     headerPos = header(inputFile)
-    locIdPos, xPos, yPos, categoryPos, reviewsPos, rankPos = list(headerPos)
+    locIdPos = headerPos[0]
+    xPos = headerPos[1]
+    yPos = headerPos[2]
+    categoryPos = headerPos[3]
     locList = readFile(inputFile)[1]
     outputList = []
 
@@ -74,8 +77,8 @@ def element(locIdInput, inputFile):
             try:
                 outputList.append(float(line[xPos]))
                 outputList.append(float(line[yPos]))
-                outputList.append(float(line[reviewsPos]))
-                outputList.append(float(line[rankPos]))
+                # outputList.append(float(line[reviewsPos]))
+                # outputList.append(float(line[rankPos]))
             except ValueError:
                 continue
             outputList.append(line[categoryPos])
@@ -90,7 +93,11 @@ def isInRadius(x1, y1, x2, y2, radius):
 
 def LDCountFunc(inputFile, queryLocId, radius):
     headerPos = header(inputFile)
-    locIdPos, xPos, yPos, categoryPos, reviewsPos, rankPos = list(headerPos)
+    locIdPos = headerPos[0]
+    xPos = headerPos[1]
+    yPos = headerPos[2]
+    categoryPos = headerPos[3]
+
     LDCount = [{'P': 0, 'H': 0, 'R': 0, 'C': 0, 'S': 0}, {'P': 0, 'H': 0, 'R': 0, 'C': 0, 'S': 0}]
     radius = float(radius)
 
@@ -211,8 +218,7 @@ def main(inputFile, queryLocId, radius):
 
 # LDCount, simScore, DCommon, LDClose = main("Locations.csv", ["L26", "L52"], 3.5)
 LDCount, simScore, DCommon, LDClose = main ("Locations.csv" , ["  ll26  ", "  L52  "], 3.5)
-# LDCount, simScore, DCommon, LDClose = main ("testFile1.csv" , ["  l26  ", "  L52  "], 3.5)
-# LDCount, simScore, DCommon, LDClose = main ("testFile2.csv" , ["  l26  ", "  L52  "], 3.5)
+
 
 print(LDCount)
 print(simScore)
