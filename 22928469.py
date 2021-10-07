@@ -30,7 +30,7 @@ def header(inputFile):
     headerNameList = ["LOCID", "LATITUDE", "LONGITUDE", "CATEGORY"]
     for headerName in headerNameList:
         for index in range(len(header)):
-            if header[index].upper() == headerName:
+            if headerName in header[index].upper():
                 headerPos.append(index)
     return headerPos
 
@@ -254,7 +254,7 @@ def main(inputFile, queryLocId, radius):
         return LDCountFunc(inputFile, queryLocId, radius), simScoreFunc(LDCountFunc(inputFile, queryLocId, radius)), DCommonFunc(inputFile, queryLocId, radius), LDCloseFunc(inputFile, queryLocId, radius)
 
 
-# IMPORTANT: invalid input, invalid value, missing header, locID unique, header name variation, matching locId
+# IMPORTANT: invalid input, invalid value, missing header, locID unique, header name variation
 # NEED TO REMOVE 
 
 # LDCount, simScore, DCommon, LDClose = main("Locations.csv", ["L26", "L52"], 3.5)
@@ -265,6 +265,4 @@ print(LDCount)
 print(simScore)
 print(DCommon)
 print(LDClose)
-
-# print(element("l101", "Locations.csv"))
 # NEED TO REMOVE 
