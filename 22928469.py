@@ -34,6 +34,7 @@ def readFile(inputFile):
         locList = []
         for line in temp:
             locList.append(line[:-1].split(","))
+            
     return header, locList
 
 # define column position in case of random header
@@ -118,7 +119,8 @@ def DCommonFunc(inputFile, queryLocId, radius):
         x2 = float(location[1])
         y2 = float(location[2])
         if isInRadius(latitude1, longitude1, x2, y2, radius) and isInRadius(latitude2, longitude2, x2, y2, radius):
-            DCommon[location[3]].append(location[0].upper())
+            locId = location[0].upper().strip(" \"")
+            DCommon[location[3]].append(locId)
         
     return DCommon
 
@@ -173,7 +175,7 @@ def LDCloseFunc(inputFile, queryLocId, radius):
                         minLoc = locId
                         minDistance = distance(latitude1, longitude1, x2, y2)
 
-                LDClose[i][key] = minLoc.upper().strip(), minDistance
+                LDClose[i][key] = minLoc.upper().strip(" \""), minDistance
     return LDClose
 
 
