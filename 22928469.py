@@ -7,23 +7,23 @@ Student ID: 22928469
 -----------------------
 """
 
+# read file and return header list, locList
 def readFile(inputFile):
     with open (inputFile, "r") as file:
         header = file.readline()[:-1].split(",")
-        for i in range(len(header)):
-            header[i] = header[i].strip()
         temp = file.readlines()
         locList = []
         for line in temp:
             locList.append(line[:-1].split(","))
         
+        # process raw data in file - strip spaces and uppercase
         for a in range(len(locList)):
             for b in range(len(locList[a])):
                 locList[a][b] = locList[a][b].upper().strip()
 
     return header, locList
 
-# define column position in case of random header
+# define header position in case of random header
 def header(inputFile):
     header = readFile(inputFile)[0]
     headerPos = []
@@ -43,7 +43,7 @@ def getLocId(locId):
     locId = locId[index:].strip()
     return locId
 
-# compare the locId input with locId in locationList to add x, y, category, reviews, rankreview element of that locId to a list
+# compare locId input with locId in locList to add x, y, category element of that locId to outputList
 def element(locIdInput, inputFile):
     headerPos = header(inputFile)
     locIdPos = headerPos[0]
@@ -64,20 +64,22 @@ def element(locIdInput, inputFile):
             outputList.append(line[categoryPos])
     return outputList
 
+# handle invalid input, if True then terminate and print out error
 def handleInvalidInput(inputFile, queryLocId, radius):
     headerPos = header(inputFile)
+    locIdPos = headerPos[0]
+
+    # missing header error
     if len(headerPos) < 4:
         print("Missing header")
         return True
-    locIdPos = headerPos[0]
-    xPos = headerPos[1]
-    yPos = headerPos[2]
-    categoryPos = headerPos[3]
 
+    # invalid queryLocId input - not list type
     if type(queryLocId) != list:
         print("Invalid queryLocId input!")
         return True
 
+    # invalid queryLocId input - duplicated locId in locList
     for locId in queryLocId:
         count = 0
         for line in readFile(inputFile)[1]:
@@ -87,6 +89,7 @@ def handleInvalidInput(inputFile, queryLocId, radius):
             print("Invalid queryLocId")
             return True
 
+    # invalid radius input
     try:
         file = open(inputFile, "r")
         radius = float(radius)
@@ -96,6 +99,7 @@ def handleInvalidInput(inputFile, queryLocId, radius):
     except SyntaxError:
         print("Invalid radius input!")
         return True
+    # invalid input file
     except EOFError:
         print("Invalid inputFile!")
         return True
@@ -103,13 +107,16 @@ def handleInvalidInput(inputFile, queryLocId, radius):
         print("Invalid inputFile!")
         return True
 
+# calculate distance using x1, y1, x2, y2
 def distance(x1, y1, x2, y2):
     distance = round(((((x2 - x1)**2) + (y2 - y1)**2)) ** (1/2), 4)
     return distance
 
+# determine if locId is in radius or not
 def isInRadius(x1, y1, x2, y2, radius):
     return distance(x1, y1, x2, y2) < radius
 
+# determine if locId is duplicated in locList or not
 def isDuplicated(locId, inputFile):
     headerPos = header(inputFile)
     locIdPos = headerPos[0]
@@ -123,7 +130,7 @@ def isDuplicated(locId, inputFile):
     else:
         return False
 
-
+# count locId in radius for each category
 def LDCountFunc(inputFile, queryLocId, radius):
     headerPos = header(inputFile)
     locIdPos = headerPos[0]
@@ -151,6 +158,7 @@ def LDCountFunc(inputFile, queryLocId, radius):
         
     return LDCount
 
+# calculate the similarity between A and B
 def similarity(A, B):
     numerator = (A.get("P")*B.get("P")) + (A.get("H")*B.get("H")) + (A.get("R")*B.get("R")) + (A.get("C")*B.get("C")) + (A.get("S")*B.get("S"))
     denominator1 = (A.get("P")**2 + A.get("H")**2 + A.get("R")**2 + A.get("C")**2 + A.get("S")**2)**(1/2)
@@ -161,17 +169,19 @@ def similarity(A, B):
         result = 0
     return result
 
+# return similarity for 2 lists from LDCount
 def simScoreFunc(LDCount):
     A = LDCount[0]
     B = LDCount[1]
     return similarity(A, B)
 
+# return a dictionary with locI for each category
 def DCommonFunc(inputFile, queryLocId, radius):
     headerPos = header(inputFile)
     locIdPos, xPos, yPos, categoryPos = list(headerPos)
     DCommon = {'P': [], 'H': [], 'R': [], 'C': [], 'S': []}
     queryLocId1 = element(queryLocId[0], inputFile)
-    queryLocId2 = element(queryLocId[0], inputFile)
+    queryLocId2 = element(queryLocId[1], inputFile)
     latitude1 = float(queryLocId1[0])
     longitude1 = float(queryLocId1[1])
     latitude2 = float(queryLocId2[0])
@@ -190,13 +200,14 @@ def DCommonFunc(inputFile, queryLocId, radius):
         
     return DCommon
 
+# return 2 dictionaries with the closest locId and it's distance from queryLocId
 def LDCloseFunc(inputFile, queryLocId, radius):
     headerPos = header(inputFile)
     locIdPos, xPos, yPos, categoryPos = list(headerPos)
     temp = [{'P': [], 'H': [], 'R': [], 'C': [], 'S': []}, {'P': [], 'H': [], 'R': [], 'C': [], 'S': []}]
     LDClose = [{}, {}]
     queryLocId1 = element(queryLocId[0], inputFile)
-    queryLocId2 = element(queryLocId[0], inputFile)
+    queryLocId2 = element(queryLocId[1], inputFile)
     latitude1 = float(queryLocId1[0])
     longitude1 = float(queryLocId1[1])
     latitude2 = float(queryLocId2[0])
@@ -249,18 +260,15 @@ def LDCloseFunc(inputFile, queryLocId, radius):
                 LDClose[i][key] = minLoc, minDistance
     return LDClose
 
-
 def main(inputFile, queryLocId, radius):
     if handleInvalidInput(inputFile, queryLocId, radius):
         return None, None, None, None
     else:
         return LDCountFunc(inputFile, queryLocId, radius), simScoreFunc(LDCountFunc(inputFile, queryLocId, radius)), DCommonFunc(inputFile, queryLocId, radius), LDCloseFunc(inputFile, queryLocId, radius)
 
-
 # IMPORTANT: invalid input, invalid value, missing header
 # NEED TO REMOVE 
-# LDCount, simScore, DCommon, LDClose = main("Locations.csv", ["L26", "L52"], 3.5)
-LDCount, simScore, DCommon, LDClose = main ("Locations.csv" , ["  ll26  ", "  gg-52  "], 3.5)
+LDCount, simScore, DCommon, LDClose = main("Locations.csv", ["L26", "L52"], 3.5)
 
 print(LDCount)
 print(simScore)
