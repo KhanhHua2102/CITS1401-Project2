@@ -78,6 +78,8 @@ def isInRadius(x1, y1, x2, y2, radius):
     return distance(x1, y1, x2, y2) < radius
 
 def LDCountFunc(inputFile, queryLocId, radius):
+    headerPos = header(inputFile)
+    locIdPos, xPos, yPos, categoryPos, reviewsPos, rankPos = list(headerPos)
     for i in range(len(queryLocId)):
         queryLocId[i] = queryLocId[i].strip().upper()
     LDCount = [{'P': 0, 'H': 0, 'R': 0, 'C': 0, 'S': 0}, {'P': 0, 'H': 0, 'R': 0, 'C': 0, 'S': 0}]
@@ -85,14 +87,14 @@ def LDCountFunc(inputFile, queryLocId, radius):
 
     locList = readFile(inputFile)[1]
     for location in locList:
-        x2 = float(location[1])
-        y2 = float(location[2])
+        x2 = float(location[xPos])
+        y2 = float(location[yPos])
 
         for i in range(2):
             latitude1 = float(element(queryLocId[i], inputFile)[0])
             longitude1 = float(element(queryLocId[i], inputFile)[1])
             if isInRadius(latitude1, longitude1, x2, y2, radius):
-                LDCount[i][location[3]] = LDCount[i].get(location[3]) + 1
+                LDCount[i][location[categoryPos]] = LDCount[i].get(location[categoryPos]) + 1
         
     return LDCount
 
@@ -109,6 +111,8 @@ def simScoreFunc(LDCount):
     return similarity(A, B)
 
 def DCommonFunc(inputFile, queryLocId, radius):
+    headerPos = header(inputFile)
+    locIdPos, xPos, yPos, categoryPos, reviewsPos, rankPos = list(headerPos)
     for i in range(len(queryLocId)):
         queryLocId[i] = queryLocId[i].strip().upper()
     DCommon = {'P': [], 'H': [], 'R': [], 'C': [], 'S': []}
@@ -122,15 +126,17 @@ def DCommonFunc(inputFile, queryLocId, radius):
 
     locList = readFile(inputFile)[1]
     for location in locList:
-        x2 = float(location[1])
-        y2 = float(location[2])
+        x2 = float(location[xPos])
+        y2 = float(location[yPos])
         if isInRadius(latitude1, longitude1, x2, y2, radius) and isInRadius(latitude2, longitude2, x2, y2, radius):
-            locId = location[0]
-            DCommon[location[3]].append(locId)
+            locId = location[locIdPos]
+            DCommon[location[categoryPos]].append(locId)
         
     return DCommon
 
 def LDCloseFunc(inputFile, queryLocId, radius):
+    headerPos = header(inputFile)
+    locIdPos, xPos, yPos, categoryPos, reviewsPos, rankPos = list(headerPos)
     for i in range(len(queryLocId)):
         queryLocId[i] = queryLocId[i].strip().upper()
     temp = [{'P': [], 'H': [], 'R': [], 'C': [], 'S': []}, {'P': [], 'H': [], 'R': [], 'C': [], 'S': []}]
@@ -147,12 +153,12 @@ def LDCloseFunc(inputFile, queryLocId, radius):
     for location in locList:
         locId = location[0]
         if locId != queryLocId[0] and locId != queryLocId[1]:
-            x2 = float(location[1])
-            y2 = float(location[2])
+            x2 = float(location[xPos])
+            y2 = float(location[yPos])
             if isInRadius(latitude1, longitude1, x2, y2, radius):
-                temp[0][location[3]].append(location[0]) 
+                temp[0][location[categoryPos]].append(location[locIdPos]) 
             if isInRadius(latitude2, longitude2, x2, y2, radius):
-                temp[1][location[3]].append(location[0])
+                temp[1][location[categoryPos]].append(location[locIdPos])
         else:
             continue
 
