@@ -34,17 +34,21 @@ def readFile(inputFile):
         locList = []
         for line in temp:
             locList.append(line[:-1].split(","))
-            
+        
+        for a in range(len(locList)):
+            for b in range(len(locList[a])):
+                locList[a][b] = locList[a][b].upper().strip()
+
     return header, locList
 
 # define column position in case of random header
 def header(inputFile):
     header = readFile(inputFile)[0]
     headerPos = []
-    headerNameList = ["locid", "latitude", "longitude", "category", "reviews", "rankreview"]
+    headerNameList = ["LOCID", "LATITUDE", "LONGITUDE", "CATEGORY", "REVIEWS", "RANKREVIEW"]
     for headerName in headerNameList:
         for index in range(6):
-            if header[index].lower() == headerName:
+            if header[index].upper() == headerName:
                 headerPos.append(index)
     return headerPos
 
@@ -55,7 +59,7 @@ def element(locId, inputFile):
     locList = readFile(inputFile)[1]
     outputList = []
     for location in locList:
-        if locId.lower() == location[locIdPos].lower():
+        if locId.upper() == location[locIdPos]:
             try:
                 outputList.append(float(location[xPos]))
                 outputList.append(float(location[yPos]))
@@ -63,7 +67,7 @@ def element(locId, inputFile):
                 outputList.append(float(location[rankPos]))
             except ValueError:
                 continue
-            outputList.append(location[categoryPos].lower())
+            outputList.append(location[categoryPos])
     return outputList
 
 def distance(x1, y1, x2, y2):
@@ -74,6 +78,8 @@ def isInRadius(x1, y1, x2, y2, radius):
     return distance(x1, y1, x2, y2) < radius
 
 def LDCountFunc(inputFile, queryLocId, radius):
+    for i in range(len(queryLocId)):
+        queryLocId[i] = queryLocId[i].strip().upper()
     LDCount = [{'P': 0, 'H': 0, 'R': 0, 'C': 0, 'S': 0}, {'P': 0, 'H': 0, 'R': 0, 'C': 0, 'S': 0}]
     radius = float(radius)
 
@@ -83,8 +89,8 @@ def LDCountFunc(inputFile, queryLocId, radius):
         y2 = float(location[2])
 
         for i in range(2):
-            latitude1 = float(element(queryLocId[i].strip(), inputFile)[0])
-            longitude1 = float(element(queryLocId[i].strip(), inputFile)[1])
+            latitude1 = float(element(queryLocId[i], inputFile)[0])
+            longitude1 = float(element(queryLocId[i], inputFile)[1])
             if isInRadius(latitude1, longitude1, x2, y2, radius):
                 LDCount[i][location[3]] = LDCount[i].get(location[3]) + 1
         
@@ -104,7 +110,7 @@ def simScoreFunc(LDCount):
 
 def DCommonFunc(inputFile, queryLocId, radius):
     for i in range(len(queryLocId)):
-        queryLocId[i] = queryLocId[i].strip().lower()
+        queryLocId[i] = queryLocId[i].strip().upper()
     DCommon = {'P': [], 'H': [], 'R': [], 'C': [], 'S': []}
     queryLocId1 = element(queryLocId[0], inputFile)
     queryLocId2 = element(queryLocId[0], inputFile)
@@ -119,14 +125,14 @@ def DCommonFunc(inputFile, queryLocId, radius):
         x2 = float(location[1])
         y2 = float(location[2])
         if isInRadius(latitude1, longitude1, x2, y2, radius) and isInRadius(latitude2, longitude2, x2, y2, radius):
-            locId = location[0].upper().strip(" \"")
+            locId = location[0]
             DCommon[location[3]].append(locId)
         
     return DCommon
 
 def LDCloseFunc(inputFile, queryLocId, radius):
     for i in range(len(queryLocId)):
-        queryLocId[i] = queryLocId[i].strip().lower()
+        queryLocId[i] = queryLocId[i].strip().upper()
     temp = [{'P': [], 'H': [], 'R': [], 'C': [], 'S': []}, {'P': [], 'H': [], 'R': [], 'C': [], 'S': []}]
     LDClose = [{}, {}]
     queryLocId1 = element(queryLocId[0], inputFile)
@@ -139,7 +145,7 @@ def LDCloseFunc(inputFile, queryLocId, radius):
 
     locList = readFile(inputFile)[1]
     for location in locList:
-        locId = location[0].strip().lower()
+        locId = location[0]
         if locId != queryLocId[0] and locId != queryLocId[1]:
             x2 = float(location[1])
             y2 = float(location[2])
@@ -175,7 +181,7 @@ def LDCloseFunc(inputFile, queryLocId, radius):
                         minLoc = locId
                         minDistance = distance(latitude1, longitude1, x2, y2)
 
-                LDClose[i][key] = minLoc.upper().strip(" \""), minDistance
+                LDClose[i][key] = minLoc, minDistance
     return LDClose
 
 
