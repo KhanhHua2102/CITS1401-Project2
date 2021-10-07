@@ -52,22 +52,33 @@ def header(inputFile):
                 headerPos.append(index)
     return headerPos
 
+# get locId number from locID
+def getLocId(locId):
+    for char in locId:
+        if char.isdigit():
+            index = locId.index(char)
+            break
+    locId = locId[index:].strip()
+    return locId
+
 # compare the locId input with locId in locationList to add x, y, category, reviews, rankreview element of that locId to a list
-def element(locId, inputFile):
+def element(locIdInput, inputFile):
     headerPos = header(inputFile)
     locIdPos, xPos, yPos, categoryPos, reviewsPos, rankPos = list(headerPos)
     locList = readFile(inputFile)[1]
     outputList = []
-    for location in locList:
-        if locId.upper() == location[locIdPos]:
+
+    for line in locList:
+        locId = line[locIdPos]
+        if getLocId(locIdInput) == getLocId(locId):
             try:
-                outputList.append(float(location[xPos]))
-                outputList.append(float(location[yPos]))
-                outputList.append(float(location[reviewsPos]))
-                outputList.append(float(location[rankPos]))
+                outputList.append(float(line[xPos]))
+                outputList.append(float(line[yPos]))
+                outputList.append(float(line[reviewsPos]))
+                outputList.append(float(line[rankPos]))
             except ValueError:
                 continue
-            outputList.append(location[categoryPos])
+            outputList.append(line[categoryPos])
     return outputList
 
 def distance(x1, y1, x2, y2):
@@ -80,8 +91,6 @@ def isInRadius(x1, y1, x2, y2, radius):
 def LDCountFunc(inputFile, queryLocId, radius):
     headerPos = header(inputFile)
     locIdPos, xPos, yPos, categoryPos, reviewsPos, rankPos = list(headerPos)
-    for i in range(len(queryLocId)):
-        queryLocId[i] = queryLocId[i].strip().upper()
     LDCount = [{'P': 0, 'H': 0, 'R': 0, 'C': 0, 'S': 0}, {'P': 0, 'H': 0, 'R': 0, 'C': 0, 'S': 0}]
     radius = float(radius)
 
@@ -113,8 +122,6 @@ def simScoreFunc(LDCount):
 def DCommonFunc(inputFile, queryLocId, radius):
     headerPos = header(inputFile)
     locIdPos, xPos, yPos, categoryPos, reviewsPos, rankPos = list(headerPos)
-    for i in range(len(queryLocId)):
-        queryLocId[i] = queryLocId[i].strip().upper()
     DCommon = {'P': [], 'H': [], 'R': [], 'C': [], 'S': []}
     queryLocId1 = element(queryLocId[0], inputFile)
     queryLocId2 = element(queryLocId[0], inputFile)
@@ -137,8 +144,6 @@ def DCommonFunc(inputFile, queryLocId, radius):
 def LDCloseFunc(inputFile, queryLocId, radius):
     headerPos = header(inputFile)
     locIdPos, xPos, yPos, categoryPos, reviewsPos, rankPos = list(headerPos)
-    for i in range(len(queryLocId)):
-        queryLocId[i] = queryLocId[i].strip().upper()
     temp = [{'P': [], 'H': [], 'R': [], 'C': [], 'S': []}, {'P': [], 'H': [], 'R': [], 'C': [], 'S': []}]
     LDClose = [{}, {}]
     queryLocId1 = element(queryLocId[0], inputFile)
@@ -150,15 +155,18 @@ def LDCloseFunc(inputFile, queryLocId, radius):
     radius = float(radius)
 
     locList = readFile(inputFile)[1]
-    for location in locList:
-        locId = location[0]
-        if locId != queryLocId[0] and locId != queryLocId[1]:
-            x2 = float(location[xPos])
-            y2 = float(location[yPos])
+
+    for line in locList:
+        locId = line[locIdPos]
+        if getLocId(locId) != getLocId(queryLocId[0]) and getLocId(locId) != getLocId(queryLocId[1]):
+
+            x2 = float(line[xPos])
+            y2 = float(line[yPos])
             if isInRadius(latitude1, longitude1, x2, y2, radius):
-                temp[0][location[categoryPos]].append(location[locIdPos]) 
+                temp[0][line[categoryPos]].append(line[locIdPos]) 
             if isInRadius(latitude2, longitude2, x2, y2, radius):
-                temp[1][location[categoryPos]].append(location[locIdPos])
+                temp[1][line[categoryPos]].append(line[locIdPos])
+
         else:
             continue
 
@@ -198,10 +206,14 @@ def main(inputFile, queryLocId, radius):
         return LDCountFunc(inputFile, queryLocId, radius), simScoreFunc(LDCountFunc(inputFile, queryLocId, radius)), DCommonFunc(inputFile, queryLocId, radius), LDCloseFunc(inputFile, queryLocId, radius)
 
 
-# IMPORTANT: invalid input, file open error handle, invalid value, random row id, missing header, case insensitive, locID unique, header name variation, matching locId, strip, random header
+# IMPORTANT: invalid input, invalid value, random row id, missing header, locID unique, header name variation, matching locId
 # NEED TO REMOVE 
+
 # LDCount, simScore, DCommon, LDClose = main("Locations.csv", ["L26", "L52"], 3.5)
-LDCount, simScore, DCommon, LDClose = main ("Locations.csv" , ["  l26  ", "  L52  "], 3.5)
+LDCount, simScore, DCommon, LDClose = main ("Locations.csv" , ["  ll26  ", "  L52  "], 3.5)
+# LDCount, simScore, DCommon, LDClose = main ("testFile1.csv" , ["  l26  ", "  L52  "], 3.5)
+# LDCount, simScore, DCommon, LDClose = main ("testFile2.csv" , ["  l26  ", "  L52  "], 3.5)
+
 print(LDCount)
 print(simScore)
 print(DCommon)
