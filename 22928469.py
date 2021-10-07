@@ -260,6 +260,7 @@ def LDCloseFunc(inputFile, queryLocId, radius):
                 LDClose[i][key] = minLoc, minDistance
     return LDClose
 
+# main function calling other functions
 def main(inputFile, queryLocId, radius):
     if handleInvalidInput(inputFile, queryLocId, radius):
         return None, None, None, None
