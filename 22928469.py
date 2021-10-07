@@ -66,6 +66,9 @@ def element(locIdInput, inputFile):
 
 def handleInvalidInput(inputFile, queryLocId, radius):
     headerPos = header(inputFile)
+    if len(headerPos) < 4:
+        print("Missing header")
+        return True
     locIdPos = headerPos[0]
     xPos = headerPos[1]
     yPos = headerPos[2]
@@ -254,12 +257,10 @@ def main(inputFile, queryLocId, radius):
         return LDCountFunc(inputFile, queryLocId, radius), simScoreFunc(LDCountFunc(inputFile, queryLocId, radius)), DCommonFunc(inputFile, queryLocId, radius), LDCloseFunc(inputFile, queryLocId, radius)
 
 
-# IMPORTANT: invalid input, invalid value, missing header, locID unique, header name variation
+# IMPORTANT: invalid input, invalid value, missing header
 # NEED TO REMOVE 
-
 # LDCount, simScore, DCommon, LDClose = main("Locations.csv", ["L26", "L52"], 3.5)
 LDCount, simScore, DCommon, LDClose = main ("Locations.csv" , ["  ll26  ", "  gg-52  "], 3.5)
-
 
 print(LDCount)
 print(simScore)
