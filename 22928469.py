@@ -267,7 +267,7 @@ def main(inputFile, queryLocId, radius):
     else:
         return LDCountFunc(inputFile, queryLocId, radius), simScoreFunc(LDCountFunc(inputFile, queryLocId, radius)), DCommonFunc(inputFile, queryLocId, radius), LDCloseFunc(inputFile, queryLocId, radius)
 
-# IMPORTANT: invalid input, invalid value, missing header
+# IMPORTANT: invalid input, invalid value
 # NEED TO REMOVE 
 LDCount, simScore, DCommon, LDClose = main("Locations.csv", ["L26", "L52"], 3.5)
 
