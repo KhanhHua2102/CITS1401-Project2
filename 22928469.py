@@ -20,7 +20,6 @@ def readFile(inputFile):
         for line in range(len(locList)):
             for item in range(len(locList[line])):
                 locList[line][item] = locList[line][item].upper().strip()
-
     return header, locList
 
 # define header position in case of random header
@@ -46,10 +45,7 @@ def getLocId(locId):
 # compare locId input with locId in locList to add x, y, category element of that locId to outputList
 def element(locIdInput, inputFile):
     headerPos = header(inputFile)
-    locIdPos = headerPos[0]
-    xPos = headerPos[1]
-    yPos = headerPos[2]
-    categoryPos = headerPos[3]
+    locIdPos, xPos, yPos, categoryPos = list(headerPos)
     locList = readFile(inputFile)[1]
     outputList = []
 
@@ -85,7 +81,9 @@ def handleInvalidInput(inputFile, queryLocId, radius):
         for line in readFile(inputFile)[1]:
             if getLocId(locId) == getLocId(line[locIdPos]):
                 count += 1
-        if count == 0 or count > 1:
+                if count > 1:
+                    break
+        if count != 1:
             print("Invalid queryLocId")
             return True
 
@@ -125,18 +123,14 @@ def isDuplicated(locId, inputFile):
     for line in locList:
         if locId == line[locIdPos]:
             count += 1
-    if count > 1:
-        return True
-    else:
-        return False
+            if count > 1:
+                return True
+    return False
 
 # count locId in radius for each category
 def LDCountFunc(inputFile, queryLocId, radius):
     headerPos = header(inputFile)
-    locIdPos = headerPos[0]
-    xPos = headerPos[1]
-    yPos = headerPos[2]
-    categoryPos = headerPos[3]
+    locIdPos, xPos, yPos, categoryPos = list(headerPos)
 
     LDCount = [{'P': 0, 'H': 0, 'R': 0, 'C': 0, 'S': 0}, {'P': 0, 'H': 0, 'R': 0, 'C': 0, 'S': 0}]
     radius = float(radius)
@@ -207,9 +201,9 @@ def LDCloseFunc(inputFile, queryLocId, radius):
     temp = [{'P': [], 'H': [], 'R': [], 'C': [], 'S': []}, {'P': [], 'H': [], 'R': [], 'C': [], 'S': []}]
     LDClose = [{}, {}]
     queryLocId1 = element(queryLocId[0], inputFile)
-    queryLocId2 = element(queryLocId[1], inputFile)
     latitude1 = float(queryLocId1[0])
     longitude1 = float(queryLocId1[1])
+    queryLocId2 = element(queryLocId[1], inputFile)
     latitude2 = float(queryLocId2[0])
     longitude2 = float(queryLocId2[1])
     radius = float(radius)
@@ -224,10 +218,10 @@ def LDCloseFunc(inputFile, queryLocId, radius):
 
             x2 = float(line[xPos])
             y2 = float(line[yPos])
-            if isInRadius(latitude1, longitude1, x2, y2, radius):
-                temp[0][line[categoryPos]].append(line[locIdPos]) 
-            if isInRadius(latitude2, longitude2, x2, y2, radius):
-                temp[1][line[categoryPos]].append(line[locIdPos])
+
+            for dict in temp:
+                if isInRadius(latitude1, longitude1, x2, y2, radius):
+                    dict[line[categoryPos]].append(line[locIdPos])
 
         else:
             continue
@@ -236,10 +230,10 @@ def LDCloseFunc(inputFile, queryLocId, radius):
         for key in temp[i].keys():
             if len(temp[i][key]) > 0:
 
-                minLoc = temp[i][key][0]
                 queryLocId12 = element(queryLocId[i] , inputFile)
                 latitude1 = float(queryLocId12[0])
                 longitude1 = float(queryLocId12[1])
+                minLoc = temp[i][key][0]
                 x2  = element(minLoc, inputFile)[0]
                 y2  = element(minLoc, inputFile)[1]
                 minDistance = distance(latitude1, longitude1, x2, y2)
@@ -248,9 +242,6 @@ def LDCloseFunc(inputFile, queryLocId, radius):
                 for locId in locIdList:
                     if locIdList.index(locId) == 0:
                         continue
-                    queryLocId12 = element(queryLocId[i], inputFile)
-                    latitude1 = float(queryLocId12[0])
-                    longitude1 = float(queryLocId12[1])
                     x2  = element(locId, inputFile)[0]
                     y2  = element(locId, inputFile)[1]
                     if distance(latitude1, longitude1, x2, y2) < minDistance:
