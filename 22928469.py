@@ -17,9 +17,9 @@ def readFile(inputFile):
             locList.append(line[:-1].split(","))
         
         # process raw data in file - strip spaces and uppercase
-        for a in range(len(locList)):
-            for b in range(len(locList[a])):
-                locList[a][b] = locList[a][b].upper().strip()
+        for line in range(len(locList)):
+            for item in range(len(locList[line])):
+                locList[line][item] = locList[line][item].upper().strip()
 
     return header, locList
 
@@ -275,4 +275,4 @@ print(LDCount)
 print(simScore)
 print(DCommon)
 print(LDClose)
-# NEED TO REMOVE 
+# NEED TO REMOVE
