@@ -139,8 +139,11 @@ def LDCountFunc(inputFile, queryLocId, radius):
     for line in locList:
         if isDuplicated(line[locIdPos], inputFile):
             continue
-        x2 = float(line[xPos])
-        y2 = float(line[yPos])
+        try:
+            x2 = float(line[xPos])
+            y2 = float(line[yPos])
+        except ValueError:
+            continue
 
         for i in range(len(queryLocId)):
             if len(element(queryLocId[i], inputFile)) == 0:
@@ -186,8 +189,11 @@ def DCommonFunc(inputFile, queryLocId, radius):
     for line in locList:
         if isDuplicated(line[locIdPos], inputFile):
             continue
-        x2 = float(line[xPos])
-        y2 = float(line[yPos])
+        try:
+            x2 = float(line[xPos])
+            y2 = float(line[yPos])
+        except ValueError:
+            continue
         if isInRadius(latitude1, longitude1, x2, y2, radius) and isInRadius(latitude2, longitude2, x2, y2, radius):
             locId = line[locIdPos]
             DCommon[line[categoryPos]].append(locId)
@@ -200,12 +206,14 @@ def LDCloseFunc(inputFile, queryLocId, radius):
     locIdPos, xPos, yPos, categoryPos = list(headerPos)
     temp = [{'P': [], 'H': [], 'R': [], 'C': [], 'S': []}, {'P': [], 'H': [], 'R': [], 'C': [], 'S': []}]
     LDClose = [{}, {}]
-    queryLocId1 = element(queryLocId[0], inputFile)
-    latitude1 = float(queryLocId1[0])
-    longitude1 = float(queryLocId1[1])
-    queryLocId2 = element(queryLocId[1], inputFile)
-    latitude2 = float(queryLocId2[0])
-    longitude2 = float(queryLocId2[1])
+
+    # add latitude and longitude of queryLocId into a list
+    latitude = []
+    longitude = []
+    for i in range(len(queryLocId)):
+        latitude.append(element(queryLocId[i], inputFile)[0])
+        longitude.append(element(queryLocId[i], inputFile)[1])
+
     radius = float(radius)
 
     locList = readFile(inputFile)[1]
@@ -214,17 +222,17 @@ def LDCloseFunc(inputFile, queryLocId, radius):
         if isDuplicated(line[locIdPos], inputFile):
             continue
         locId = line[locIdPos]
+
         if getLocId(locId) != getLocId(queryLocId[0]) and getLocId(locId) != getLocId(queryLocId[1]):
+            try:
+                x2 = float(line[xPos])
+                y2 = float(line[yPos])
+            except ValueError:
+                continue
 
-            x2 = float(line[xPos])
-            y2 = float(line[yPos])
-
-            for dict in temp:
-                if isInRadius(latitude1, longitude1, x2, y2, radius):
-                    dict[line[categoryPos]].append(line[locIdPos])
-
-        else:
-            continue
+            for i in range(len(queryLocId)):
+                if isInRadius(latitude[i], longitude[i], x2, y2, radius):
+                    temp[i][line[categoryPos]].append(line[locIdPos])
 
     for i in range(len(queryLocId)):
         for key in temp[i].keys():
