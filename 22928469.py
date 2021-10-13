@@ -10,11 +10,11 @@ Student ID: 22928469
 # read file and return header list, locList
 def readFile(inputFile):
     with open (inputFile, "r") as file:
-        header = file.readline()[:-1].split(",")
+        header = file.readline().strip("\n").split(",")
         temp = file.readlines()
         locList = []
         for line in temp:
-            locList.append(line[:-1].split(","))
+            locList.append(line.strip("\n").split(","))
         
         # process raw data in file - strip spaces and uppercase
         for line in range(len(locList)):
