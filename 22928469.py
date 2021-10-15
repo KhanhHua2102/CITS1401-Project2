@@ -180,12 +180,14 @@ def DCommonFunc(inputFile, queryLocId, radius):
     headerPos = header(inputFile)
     locIdPos, xPos, yPos, categoryPos = list(headerPos)
     DCommon = {'P': [], 'H': [], 'R': [], 'C': [], 'S': []}
-    queryLocId1 = element(queryLocId[0], inputFile)
-    queryLocId2 = element(queryLocId[1], inputFile)
-    latitude1 = float(queryLocId1[0])
-    longitude1 = float(queryLocId1[1])
-    latitude2 = float(queryLocId2[0])
-    longitude2 = float(queryLocId2[1])
+
+    latitude = []
+    longitude = []
+    for i in range(len(queryLocId)):
+        temp = element(queryLocId[i], inputFile)
+        latitude.append(float(temp[0]))
+        longitude.append(float(temp[1]))
+
     radius = float(radius)
 
     locList = readFile(inputFile)[1]
@@ -197,7 +199,13 @@ def DCommonFunc(inputFile, queryLocId, radius):
             y2 = float(line[yPos])
         except ValueError:
             continue
-        if isInRadius(latitude1, longitude1, x2, y2, radius) and isInRadius(latitude2, longitude2, x2, y2, radius):
+
+        locInRange = True
+        for locId in range(len(queryLocId)):
+            if not isInRadius(latitude[locId], longitude[locId], x2, y2, radius):
+                locInRange = False
+
+        if locInRange:
             locId = line[locIdPos]
             DCommon[line[categoryPos]].append(locId)
         
@@ -271,10 +279,17 @@ def main(inputFile, queryLocId, radius):
 
 # IMPORTANT: invalid input, invalid value
 # NEED TO REMOVE 
-LDCount, simScore, DCommon, LDClose = main("Locations.csv", ["L26", "L52"], 3.5)
+LDCount, simScore, DCommon, LDClose = main("Locations copy.csv", ["L26", "L52", "l32"], 3.5)
 
 print(LDCount)
 print(simScore)
 print(DCommon)
 print(LDClose)
 # NEED TO REMOVE
+# LDCount1, simScore1, DCommon1, LDClose1 = main("Locations.csv", ["L26", "L52"], 3.5)
+# LDCount1 = [{'P': 1, 'H': 3, 'R': 2, 'C': 2, 'S': 3}, {'P':3, 'H': 2, 'R': 1, 'C': 0, 'S': 2}]
+# simScore1 = 0.7711
+# DCommon1 = {'P': ['L26'], 'H': ['L52', 'L22'], 'R': ['L88'],'C': [], 'S': ['L30']}
+# LDClose1 = [{'H': ('L77', 2.3034), 'R': ('L88', 0.7736), 'C':('L29', 2.0607), 
+# 'S': ('L65', 1.556)}, {'P': ('L46', 2.4717),'H': ('L22', 1.4374), 
+# 'R': ('L88', 2.5338), 'S': ('L30',2.0482)}]
