@@ -88,6 +88,9 @@ def handleInvalidInput(inputFile, queryLocId, radius):
             return True
 
     # invalid radius input
+    if radius <= 0:
+        print("Invalid radius")
+        return True
     try:
         file = open(inputFile, "r")
         radius = float(radius)
