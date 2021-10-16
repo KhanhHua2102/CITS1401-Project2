@@ -168,6 +168,7 @@ def similarity(A, B):
     try:
         result = round(numerator / (denominator1 * denominator2), 4)
     except ZeroDivisionError:
+        print("Error divide by zero")
         result = 0
     return result
 
