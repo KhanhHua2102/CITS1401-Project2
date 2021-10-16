@@ -160,9 +160,11 @@ def LDCountFunc(inputFile, queryLocId, radius):
 
 # calculate the similarity between A and B
 def similarity(A, B):
-    numerator = (A.get("P")*B.get("P")) + (A.get("H")*B.get("H")) + (A.get("R")*B.get("R")) + (A.get("C")*B.get("C")) + (A.get("S")*B.get("S"))
-    denominator1 = (A.get("P")**2 + A.get("H")**2 + A.get("R")**2 + A.get("C")**2 + A.get("S")**2)**(1/2)
-    denominator2 = (B.get("P")**2 + B.get("H")**2 + B.get("R")**2 + B.get("C")**2 + B.get("S")**2)**(1/2)
+    listA = list(A.values())
+    listB = list(B.values())
+    numerator = sum(listA[i] * listB[i] for i in range(len(listA)))
+    denominator1 = sum(value * value for value in listA)**(1/2)
+    denominator2 = sum(value * value for value in listB)**(1/2)
     try:
         result = round(numerator / (denominator1 * denominator2), 4)
     except ZeroDivisionError:
@@ -279,8 +281,7 @@ def main(inputFile, queryLocId, radius):
 
 # IMPORTANT: invalid input, invalid value
 # NEED TO REMOVE 
-LDCount, simScore, DCommon, LDClose = main("Locations copy.csv", ["L26", "L52", "l32"], 3.5)
-
+LDCount, simScore, DCommon, LDClose = main("Locations copy.csv", ["L26", "L52"], 3.5)
 print(LDCount)
 print(simScore)
 print(DCommon)
