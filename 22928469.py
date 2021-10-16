@@ -7,6 +7,55 @@ Student ID: 22928469
 -----------------------
 """
 
+# handle invalid input, if True then terminate and print out error
+def handleInvalidInput(inputFile, queryLocId, radius):
+    # invalid input file
+    try:
+        file = open(inputFile, "r")
+    except EOFError:
+        print("Invalid inputFile!")
+        return True
+    except FileNotFoundError:
+        print("Invalid inputFile!")
+        return True
+
+    # missing header error
+    headerPos = header(inputFile)
+    locIdPos = headerPos[0]
+    if len(headerPos) < 4:
+        print("Missing header")
+        return True
+
+    # invalid queryLocId input - not list type
+    if type(queryLocId) != list:
+        print("Invalid queryLocId input!")
+        return True
+
+    # invalid queryLocId input - duplicated locId in locList
+    for locId in queryLocId:
+        count = 0
+        for line in readFile(inputFile)[1]:
+            if getLocId(locId) == getLocId(line[locIdPos]):
+                count += 1
+                if count > 1:
+                    break
+        if count != 1:
+            print("Invalid queryLocId")
+            return True
+
+    # invalid radius input
+    if radius <= 0:
+        print("Invalid radius")
+        return True
+    try:
+        radius = float(radius)
+    except ValueError:
+        print("Invalid radius input!")
+        return True
+    except SyntaxError:
+        print("Invalid radius input!")
+        return True
+
 # read file and return header list, locList
 def readFile(inputFile):
     with open (inputFile, "r") as file:
@@ -38,9 +87,9 @@ def getLocId(locId):
     for char in locId:
         if char.isdigit():
             index = locId.index(char)
-            break
-    locId = locId[index:].strip()
-    return locId
+            return locId[index:].strip()
+    print("Not found locId")
+    return None
 
 # compare locId input with locId in locList to add x, y, category element of that locId to outputList
 def element(locIdInput, inputFile):
@@ -59,54 +108,6 @@ def element(locIdInput, inputFile):
                 continue
             outputList.append(line[categoryPos])
     return outputList
-
-# handle invalid input, if True then terminate and print out error
-def handleInvalidInput(inputFile, queryLocId, radius):
-    headerPos = header(inputFile)
-    locIdPos = headerPos[0]
-
-    # missing header error
-    if len(headerPos) < 4:
-        print("Missing header")
-        return True
-
-    # invalid queryLocId input - not list type
-    if type(queryLocId) != list:
-        print("Invalid queryLocId input!")
-        return True
-
-    # invalid queryLocId input - duplicated locId in locList
-    for locId in queryLocId:
-        count = 0
-        for line in readFile(inputFile)[1]:
-            if getLocId(locId) == getLocId(line[locIdPos]):
-                count += 1
-                if count > 1:
-                    break
-        if count != 1:
-            print("Invalid queryLocId")
-            return True
-
-    # invalid radius input
-    if radius <= 0:
-        print("Invalid radius")
-        return True
-    try:
-        file = open(inputFile, "r")
-        radius = float(radius)
-    except ValueError:
-        print("Invalid radius input!")
-        return True
-    except SyntaxError:
-        print("Invalid radius input!")
-        return True
-    # invalid input file
-    except EOFError:
-        print("Invalid inputFile!")
-        return True
-    except FileNotFoundError:
-        print("Invalid inputFile!")
-        return True
 
 # calculate distance using x1, y1, x2, y2
 def distance(x1, y1, x2, y2):
@@ -155,7 +156,6 @@ def LDCountFunc(inputFile, queryLocId, radius):
             longitude1 = float(element(queryLocId[i], inputFile)[1])
             if isInRadius(latitude1, longitude1, x2, y2, radius):
                 LDCount[i][line[categoryPos]] = LDCount[i].get(line[categoryPos]) + 1
-        
     return LDCount
 
 # calculate the similarity between A and B
@@ -169,7 +169,7 @@ def similarity(A, B):
         result = round(numerator / (denominator1 * denominator2), 4)
     except ZeroDivisionError:
         print("Error divide by zero")
-        result = 0
+        return 0
     return result
 
 # return similarity for 2 lists from LDCount
@@ -280,18 +280,16 @@ def main(inputFile, queryLocId, radius):
     else:
         return LDCountFunc(inputFile, queryLocId, radius), simScoreFunc(LDCountFunc(inputFile, queryLocId, radius)), DCommonFunc(inputFile, queryLocId, radius), LDCloseFunc(inputFile, queryLocId, radius)
 
-# IMPORTANT: invalid input, invalid value
 # NEED TO REMOVE 
+# IMPORTANT: invalid input, invalid value
 LDCount, simScore, DCommon, LDClose = main("Locations copy.csv", ["L26", "L52"], 3.5)
 print(LDCount)
 print(simScore)
 print(DCommon)
 print(LDClose)
-# NEED TO REMOVE
-# LDCount1, simScore1, DCommon1, LDClose1 = main("Locations.csv", ["L26", "L52"], 3.5)
 # LDCount1 = [{'P': 1, 'H': 3, 'R': 2, 'C': 2, 'S': 3}, {'P':3, 'H': 2, 'R': 1, 'C': 0, 'S': 2}]
 # simScore1 = 0.7711
 # DCommon1 = {'P': ['L26'], 'H': ['L52', 'L22'], 'R': ['L88'],'C': [], 'S': ['L30']}
-# LDClose1 = [{'H': ('L77', 2.3034), 'R': ('L88', 0.7736), 'C':('L29', 2.0607), 
-# 'S': ('L65', 1.556)}, {'P': ('L46', 2.4717),'H': ('L22', 1.4374), 
-# 'R': ('L88', 2.5338), 'S': ('L30',2.0482)}]
+# LDClose1 = [{'H': ('L77', 2.3034), 'R': ('L88', 0.7736), 'C':('L29', 2.0607), 'S': ('L65', 1.556)}, 
+# {'P': ('L46', 2.4717),'H': ('L22', 1.4374), 'R': ('L88', 2.5338), 'S': ('L30',2.0482)}]
+# NEED TO REMOVE
