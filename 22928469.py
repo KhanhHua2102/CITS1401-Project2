@@ -136,10 +136,16 @@ def LDCountFunc(inputFile, queryLocId, radius):
     headerPos = header(inputFile)
     locIdPos, xPos, yPos, categoryPos = list(headerPos)
 
-    LDCount = [{'P': 0, 'H': 0, 'R': 0, 'C': 0, 'S': 0}, {'P': 0, 'H': 0, 'R': 0, 'C': 0, 'S': 0}]
     radius = float(radius)
 
     locList = readFile(inputFile)[1]
+    
+    LDCount = [{}, {}]
+    for i in range(2):
+        for line in locList:
+            if LDCount[i].get(line[categoryPos]) == None:
+                LDCount[i][line[categoryPos]] = 0
+
     for line in locList:
         if isDuplicated(line[locIdPos], inputFile):
             continue
@@ -182,7 +188,12 @@ def simScoreFunc(LDCount):
 def DCommonFunc(inputFile, queryLocId, radius):
     headerPos = header(inputFile)
     locIdPos, xPos, yPos, categoryPos = list(headerPos)
-    DCommon = {'P': [], 'H': [], 'R': [], 'C': [], 'S': []}
+    locList = readFile(inputFile)[1]
+
+    DCommon = {}
+    for line in locList:
+        if DCommon.get(line[categoryPos]) == None:
+            DCommon[line[categoryPos]] = []
 
     latitude = []
     longitude = []
@@ -193,7 +204,6 @@ def DCommonFunc(inputFile, queryLocId, radius):
 
     radius = float(radius)
 
-    locList = readFile(inputFile)[1]
     for line in locList:
         if isDuplicated(line[locIdPos], inputFile):
             continue
@@ -218,7 +228,14 @@ def DCommonFunc(inputFile, queryLocId, radius):
 def LDCloseFunc(inputFile, queryLocId, radius):
     headerPos = header(inputFile)
     locIdPos, xPos, yPos, categoryPos = list(headerPos)
-    temp = [{'P': [], 'H': [], 'R': [], 'C': [], 'S': []}, {'P': [], 'H': [], 'R': [], 'C': [], 'S': []}]
+    locList = readFile(inputFile)[1]
+    
+    temp = [{}, {}]
+    for i in range(2):
+        for line in locList:
+            if temp[i].get(line[categoryPos]) == None:
+                temp[i][line[categoryPos]] = []
+    
     LDClose = [{}, {}]
 
     # add latitude and longitude of queryLocId into a list
@@ -229,8 +246,6 @@ def LDCloseFunc(inputFile, queryLocId, radius):
         longitude.append(element(queryLocId[i], inputFile)[1])
 
     radius = float(radius)
-
-    locList = readFile(inputFile)[1]
 
     for line in locList:
         if isDuplicated(line[locIdPos], inputFile):
@@ -281,7 +296,7 @@ def main(inputFile, queryLocId, radius):
         return LDCountFunc(inputFile, queryLocId, radius), simScoreFunc(LDCountFunc(inputFile, queryLocId, radius)), DCommonFunc(inputFile, queryLocId, radius), LDCloseFunc(inputFile, queryLocId, radius)
 
 # NEED TO REMOVE 
-# IMPORTANT: invalid input, invalid value
+# IMPORTANT: do not hard code category PHRCS, terminate if not 2 querylocId
 LDCount, simScore, DCommon, LDClose = main("Locations copy.csv", ["L26", "L52"], 3.5)
 print(LDCount)
 print(simScore)
