@@ -133,13 +133,11 @@ def isDuplicated(locId, inputFile):
 
 # count locId in radius for each category
 def LDCountFunc(inputFile, queryLocId, radius):
+    radius = float(radius)
     headerPos = header(inputFile)
     locIdPos, xPos, yPos, categoryPos = list(headerPos)
-
-    radius = float(radius)
-
     locList = readFile(inputFile)[1]
-    
+
     LDCount = [{}, {}]
     for i in range(2):
         for line in locList:
@@ -249,23 +247,15 @@ def LDCloseFunc(inputFile, queryLocId, radius):
     temp = LDCountFunc(inputFile, queryLocId, radius)[1]
     for i in range(len(queryLocId)):
         for key in temp[i].keys():
-            if len(temp[i][key]) > 0:
-                minLoc = temp[i][key][0]
-                x2  = element(minLoc, inputFile)[0]
-                y2  = element(minLoc, inputFile)[1]
-                minDistance = distance(latitude[i], longitude[i], x2, y2)
-
-                locIdList = temp[i][key]
-                for locId in locIdList:
-                    if locIdList.index(locId) == 0:
-                        continue
-                    x2  = element(locId, inputFile)[0]
-                    y2  = element(locId, inputFile)[1]
-                    if distance(latitude[i], longitude[i], x2, y2) < minDistance:
-                        minLoc = locId
-                        minDistance = distance(latitude[i], longitude[i], x2, y2)
-
-                LDClose[i][key] = minLoc, minDistance
+            for locId in temp[i][key]:
+                x2  = element(locId, inputFile)[0]
+                y2  = element(locId, inputFile)[1]
+                if len(temp[i][key]) > 1:
+                    if key not in LDClose[i].keys() or distance(latitude[i], longitude[i], x2, y2) < LDClose[i][key][1]:
+                        LDClose[i][key] = locId, distance(latitude[i], longitude[i], x2, y2)
+                elif len(temp[i][key]) == 1:
+                    LDClose[i][key] = locId, distance(latitude[i], longitude[i], x2, y2)
+            
     return LDClose
 
 # main function calling other functions
