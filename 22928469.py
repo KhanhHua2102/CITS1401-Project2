@@ -146,6 +146,12 @@ def LDCountFunc(inputFile, queryLocId, radius):
             if LDCount[i].get(line[categoryPos]) == None:
                 LDCount[i][line[categoryPos]] = 0
 
+    locIdDict = [{}, {}]
+    for i in range(2):
+        for line in locList:
+            if locIdDict[i].get(line[categoryPos]) == None:
+                locIdDict[i][line[categoryPos]] = []
+
     for line in locList:
         if isDuplicated(line[locIdPos], inputFile):
             continue
@@ -162,7 +168,11 @@ def LDCountFunc(inputFile, queryLocId, radius):
             longitude1 = float(element(queryLocId[i], inputFile)[1])
             if isInRadius(latitude1, longitude1, x2, y2, radius):
                 LDCount[i][line[categoryPos]] = LDCount[i].get(line[categoryPos]) + 1
-    return LDCount
+                
+                if line[locIdPos] != queryLocId[i]:
+                    locIdDict[i][line[categoryPos]].append(line[locIdPos])
+    
+    return LDCount, locIdDict
 
 # calculate the similarity between A and B
 def similarity(A, B):
@@ -226,54 +236,24 @@ def DCommonFunc(inputFile, queryLocId, radius):
 
 # return 2 dictionaries with the closest locId and it's distance from queryLocId
 def LDCloseFunc(inputFile, queryLocId, radius):
-    headerPos = header(inputFile)
-    locIdPos, xPos, yPos, categoryPos = list(headerPos)
-    locList = readFile(inputFile)[1]
-    
-    temp = [{}, {}]
-    for i in range(2):
-        for line in locList:
-            if temp[i].get(line[categoryPos]) == None:
-                temp[i][line[categoryPos]] = []
-    
+    radius = float(radius)
     LDClose = [{}, {}]
 
     # add latitude and longitude of queryLocId into a list
     latitude = []
     longitude = []
     for i in range(len(queryLocId)):
-        latitude.append(element(queryLocId[i], inputFile)[0])
-        longitude.append(element(queryLocId[i], inputFile)[1])
+        latitude.append(float(element(queryLocId[i], inputFile)[0]))
+        longitude.append(float(element(queryLocId[i], inputFile)[1]))
 
-    radius = float(radius)
-
-    for line in locList:
-        if isDuplicated(line[locIdPos], inputFile):
-            continue
-        locId = line[locIdPos]
-
-        if getLocId(locId) != getLocId(queryLocId[0]) and getLocId(locId) != getLocId(queryLocId[1]):
-            try:
-                x2 = float(line[xPos])
-                y2 = float(line[yPos])
-            except ValueError:
-                continue
-
-            for i in range(len(queryLocId)):
-                if isInRadius(latitude[i], longitude[i], x2, y2, radius):
-                    temp[i][line[categoryPos]].append(line[locIdPos])
-
+    temp = LDCountFunc(inputFile, queryLocId, radius)[1]
     for i in range(len(queryLocId)):
         for key in temp[i].keys():
             if len(temp[i][key]) > 0:
-
-                queryLocId12 = element(queryLocId[i] , inputFile)
-                latitude1 = float(queryLocId12[0])
-                longitude1 = float(queryLocId12[1])
                 minLoc = temp[i][key][0]
                 x2  = element(minLoc, inputFile)[0]
                 y2  = element(minLoc, inputFile)[1]
-                minDistance = distance(latitude1, longitude1, x2, y2)
+                minDistance = distance(latitude[i], longitude[i], x2, y2)
 
                 locIdList = temp[i][key]
                 for locId in locIdList:
@@ -281,9 +261,9 @@ def LDCloseFunc(inputFile, queryLocId, radius):
                         continue
                     x2  = element(locId, inputFile)[0]
                     y2  = element(locId, inputFile)[1]
-                    if distance(latitude1, longitude1, x2, y2) < minDistance:
+                    if distance(latitude[i], longitude[i], x2, y2) < minDistance:
                         minLoc = locId
-                        minDistance = distance(latitude1, longitude1, x2, y2)
+                        minDistance = distance(latitude[i], longitude[i], x2, y2)
 
                 LDClose[i][key] = minLoc, minDistance
     return LDClose
@@ -293,7 +273,7 @@ def main(inputFile, queryLocId, radius):
     if handleInvalidInput(inputFile, queryLocId, radius):
         return None, None, None, None
     else:
-        return LDCountFunc(inputFile, queryLocId, radius), simScoreFunc(LDCountFunc(inputFile, queryLocId, radius)), DCommonFunc(inputFile, queryLocId, radius), LDCloseFunc(inputFile, queryLocId, radius)
+        return LDCountFunc(inputFile, queryLocId, radius)[0], simScoreFunc(LDCountFunc(inputFile, queryLocId, radius)[0]), DCommonFunc(inputFile, queryLocId, radius), LDCloseFunc(inputFile, queryLocId, radius)
 
 # NEED TO REMOVE 
 # IMPORTANT: do not hard code category PHRCS, terminate if not 2 querylocId
