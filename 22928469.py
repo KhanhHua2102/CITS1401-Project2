@@ -250,10 +250,7 @@ def LDCloseFunc(inputFile, queryLocId, radius):
             for locId in temp[i][key]:
                 x2  = element(locId, inputFile)[0]
                 y2  = element(locId, inputFile)[1]
-                if len(temp[i][key]) > 1:
-                    if key not in LDClose[i].keys() or distance(latitude[i], longitude[i], x2, y2) < LDClose[i][key][1]:
-                        LDClose[i][key] = locId, distance(latitude[i], longitude[i], x2, y2)
-                elif len(temp[i][key]) == 1:
+                if len(temp[i][key]) < 1 or key not in LDClose[i].keys() or distance(latitude[i], longitude[i], x2, y2) < LDClose[i][key][1]:
                     LDClose[i][key] = locId, distance(latitude[i], longitude[i], x2, y2)
             
     return LDClose
