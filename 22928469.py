@@ -266,7 +266,7 @@ def main(inputFile, queryLocId, radius):
         return LDCountFunc(inputFile, queryLocId, radius)[0], simScoreFunc(LDCountFunc(inputFile, queryLocId, radius)[0]), DCommonFunc(inputFile, queryLocId, radius), LDCloseFunc(inputFile, queryLocId, radius)
 
 # NEED TO REMOVE 
-# IMPORTANT: do not hard code category PHRCS, terminate if not 2 querylocId
+# IMPORTANT: terminate if not 2 querylocId
 LDCount, simScore, DCommon, LDClose = main("shuffle.csv", ["L26", "L52"], 3.5)
 print(LDCount)
 print(simScore)
