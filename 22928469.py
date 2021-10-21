@@ -7,6 +7,15 @@ Student ID: 22928469
 -----------------------
 """
 
+# seperate locId into 2 parts
+def getLocId(locId):
+    for char in locId:
+        if char.isdigit():
+            index = locId.index(char)
+            return locId[:index].upper(), locId[index:].strip()
+    print("Not found locId")
+    return None
+
 # handle invalid input, if True then terminate and print out error
 def handleInvalidInput(inputFile, queryLocId, radius):
     # invalid input file
@@ -26,12 +35,17 @@ def handleInvalidInput(inputFile, queryLocId, radius):
         print("Missing header")
         return True
 
-    # invalid queryLocId input - not list type
-    if type(queryLocId) != list:
-        print("Invalid queryLocId input!")
+    # invalid queryLocId input - not 2 queryLocId provided
+    if len(queryLocId) != 2:
+        print("Invalid queryLocId input! - not 2 queryLocId provided")
         return True
 
-    # invalid queryLocId input - duplicated locId in locList
+    # invalid queryLocId input - not list type
+    if type(queryLocId) != list:
+        print("Invalid queryLocId input! - not list type")
+        return True
+
+    # invalid queryLocId input - duplicated or missing locId in locList
     for locId in queryLocId:
         count = 0
         for line in readFile(inputFile)[1]:
@@ -40,12 +54,12 @@ def handleInvalidInput(inputFile, queryLocId, radius):
                 if count > 1:
                     break
         if count != 1:
-            print("Invalid queryLocId")
+            print("Invalid queryLocId input! - duplicated or missing locId")
             return True
 
     # invalid radius input
     if radius <= 0:
-        print("Invalid radius")
+        print("Invalid radius input!")
         return True
     try:
         radius = float(radius)
@@ -81,15 +95,6 @@ def header(inputFile):
             if headerName in header[index].upper():
                 headerPos.append(index)
     return headerPos
-
-# get locId number from locID
-def getLocId(locId):
-    for char in locId:
-        if char.isdigit():
-            index = locId.index(char)
-            return locId[index:].strip()
-    print("Not found locId")
-    return None
 
 # compare locId input with locId in locList to add x, y, category element of that locId to outputList
 def element(locIdInput, inputFile):
@@ -248,10 +253,11 @@ def LDCloseFunc(inputFile, queryLocId, radius):
     for i in range(len(queryLocId)):
         for key in temp[i].keys():
             for locId in temp[i][key]:
-                x2  = element(locId, inputFile)[0]
-                y2  = element(locId, inputFile)[1]
-                if len(temp[i][key]) < 1 or key not in LDClose[i].keys() or distance(latitude[i], longitude[i], x2, y2) < LDClose[i][key][1]:
-                    LDClose[i][key] = locId, distance(latitude[i], longitude[i], x2, y2)
+                if locId != queryLocId[i].upper():
+                    x2  = element(locId, inputFile)[0]
+                    y2  = element(locId, inputFile)[1]
+                    if len(temp[i][key]) < 1 or key not in LDClose[i].keys() or distance(latitude[i], longitude[i], x2, y2) < LDClose[i][key][1]:
+                        LDClose[i][key] = locId, distance(latitude[i], longitude[i], x2, y2)
             
     return LDClose
 
@@ -263,14 +269,14 @@ def main(inputFile, queryLocId, radius):
         return LDCountFunc(inputFile, queryLocId, radius)[0], simScoreFunc(LDCountFunc(inputFile, queryLocId, radius)[0]), DCommonFunc(inputFile, queryLocId, radius), LDCloseFunc(inputFile, queryLocId, radius)
 
 # NEED TO REMOVE 
-# IMPORTANT: terminate if not 2 querylocId
-LDCount, simScore, DCommon, LDClose = main("shuffle.csv", ["L26", "L52"], 3.5)
-print(LDCount)
-print(simScore)
-print(DCommon)
-print(LDClose)
-print("\n")
-LDCount, simScore, DCommon, LDClose = main("locations.csv", ["L26", "L52"], 3.5)
+# IMPORTANT:
+# LDCount, simScore, DCommon, LDClose = main("shuffle.csv", ["L26", "l52"], 3.5)
+# print(LDCount)
+# print(simScore)
+# print(DCommon)
+# print(LDClose)
+# print("\n")
+LDCount, simScore, DCommon, LDClose = main("locations copy.csv", ["L26", "l52"], 3.5)
 print(LDCount)
 print(simScore)
 print(DCommon)
